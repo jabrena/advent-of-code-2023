@@ -1,13 +1,12 @@
 package info.jab.aoc.day1;
 
+import info.jab.aoc.Day;
+import info.jab.aoc.Utils;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import info.jab.aoc.Day;
-import info.jab.aoc.Utils;
 
 /**
  * Solution for AOC 2023, Day 1
