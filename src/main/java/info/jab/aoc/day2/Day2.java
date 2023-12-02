@@ -57,9 +57,7 @@ public class Day2 implements Day<Long> {
     };
 
     Function<String, Long> extractGameId = param -> {
-        var parts = param.split(":");
-        var parts2 = parts[0].split(" ");
-        return Long.valueOf(parts2[1]);
+        return Long.valueOf(param.split(":")[0].split(" ")[1]);
     };
 
     // @formatter:off
