@@ -4,6 +4,7 @@ import info.jab.aoc.Day;
 import info.jab.aoc.Utils;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,41 +50,38 @@ public class Day1 implements Day<Long> {
             .reduce(0L, Long::sum);
     }
 
-    // @formatter:on
-
-    private static Map<String, Integer> createWordToNumberMap() {
-        return Map.ofEntries(
-            Map.entry("one", 1),
-            Map.entry("two", 2),
-            Map.entry("three", 3),
-            Map.entry("four", 4),
-            Map.entry("five", 5),
-            Map.entry("six", 6),
-            Map.entry("seven", 7),
-            Map.entry("eight", 8),
-            Map.entry("nine", 9),
-            Map.entry("oneight", 18), //AOC Trick
-            Map.entry("twone", 21), //AOC Trick
-            Map.entry("eightwo", 82) //AOC Trick
-        );
-    }
-
-    private static final Pattern DIGITS_REGEX_PATTERN = Pattern.compile(
-        "(?:\\d+|oneight|twone|eightwo|one|two|three|four|five|six|seven|eight|nine)"
+    private static final Map<String, String> map = Map.of(
+        "one", "1",
+        "two", "2",
+        "three", "3",
+        "four", "4",
+        "five", "5",
+        "six", "6",
+        "seven", "7",
+        "eight", "8",
+        "nine", "9"
     );
 
-    Function<String, Long> extractNumber = param -> {
-        Map<String, Integer> wordToNumber = createWordToNumberMap();
+    // @formatter:on
 
-        StringBuilder digits = new StringBuilder();
-        Matcher matcher = DIGITS_REGEX_PATTERN.matcher(param);
+    private static final Pattern DIGITS_REGEX_PATTERN = Pattern.compile(
+        "one|two|three|four|five|six|seven|eight|nine|\\d"
+    );
+
+    Function<String, Long> extractNumber = line -> {
+        Matcher matcher = DIGITS_REGEX_PATTERN.matcher(line);
+
+        String first = null;
+        String last = null;
+
         while (matcher.find()) {
-            String match = matcher.group();
-            digits.append(Character.isDigit(match.charAt(0)) ? match : wordToNumber.get(match));
+            if (Objects.isNull(first)) {
+                first = matcher.group();
+            }
+            last = matcher.group();
+            matcher.region(matcher.start() + 1, line.length());
         }
-
-        String number = String.valueOf(digits.charAt(0)) + digits.charAt(digits.length() - 1);
-
+        String number = map.getOrDefault(first, first) + map.getOrDefault(last, last);
         return Long.valueOf(number);
     };
 
