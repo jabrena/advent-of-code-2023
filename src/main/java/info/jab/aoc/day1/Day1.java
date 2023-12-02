@@ -2,7 +2,6 @@ package info.jab.aoc.day1;
 
 import info.jab.aoc.Day;
 import info.jab.aoc.Utils;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -31,16 +30,11 @@ public class Day1 implements Day<Long> {
     };
 
     Function<List<Long>, Long> applyRules = param -> {
-
-        //TODO Improve with a Switch case
-        String result = "";
-        if (param.size() == 1) {
-            result = String.valueOf(param.getFirst()) + String.valueOf(param.getFirst());
-        } else if (param.size() == 2) {
-            result = String.valueOf(param.getFirst()) + String.valueOf(param.getLast());
-        } else {
-            result = String.valueOf(param.getFirst()) + String.valueOf(param.getLast());
-        }
+        String result = switch (param.size()) {
+            case 1 -> String.valueOf(param.getFirst()) + String.valueOf(param.getFirst());
+            case 2 -> String.valueOf(param.getFirst()) + String.valueOf(param.getLast());
+            default -> String.valueOf(param.getFirst()) + String.valueOf(param.getLast());
+        };
         return Long.valueOf(result);
     };
 
@@ -49,152 +43,84 @@ public class Day1 implements Day<Long> {
         return Utils.readFileToList(fileName).stream()
             .map(toCharList)
             .map(toListOfDigits)
-            //.peek(System.out::println)
             .map(applyRules)
-            .reduce(0L, (a, b) -> a + b);
+            .reduce(0L, Long::sum);
     }
 
     // @formatter:on
 
-    Function<String, String> replacePatterns = param -> {
-        var paramModified = param;
+    Function<String, Long> processGame = line -> {
+        // @formatter:off
 
-        Boolean exitFlag = true;
-        Map<String, Integer> detections = new HashMap<>();
+        Map<String, Integer> stringToInt = Map.of(
+            "one", 1,
+            "two", 2,
+            "three", 3,
+            "four", 4,
+            "five", 5,
+            "six", 6,
+            "seven", 7,
+            "eight", 8,
+            "nine", 9
+        );
 
-        while (exitFlag) {
-            //Detect first pattern to apply
-            //System.out.println("running");
+        // @formatter:on
 
-            //one, two, three, four, five, six, seven, eight, and nine
+        int result = 0;
+        int firstDigit = 0;
+        int lastDigit = 0;
 
-            detections.put("one", paramModified.indexOf("one"));
-            detections.put("two", paramModified.indexOf("two"));
-            detections.put("three", paramModified.indexOf("three"));
-            detections.put("four", paramModified.indexOf("four"));
-            detections.put("five", paramModified.indexOf("five"));
-            detections.put("six", paramModified.indexOf("six"));
-            detections.put("seven", paramModified.indexOf("seven"));
-            detections.put("eight", paramModified.indexOf("eight"));
-            detections.put("nine", paramModified.indexOf("nine"));
-
-            var result = detections
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getValue() != -1)
-                .sorted(Map.Entry.comparingByValue())
-                //.peek(System.out::println)
-                .map(entry -> entry.getKey())
-                .findFirst();
-
-            //Apply pattern
-
-            if (result.isPresent()) {
-                if (result.get().equals("one")) {
-                    paramModified = paramModified.replace("one", "1");
-                } else if (result.get().equals("two")) {
-                    paramModified = paramModified.replace("two", "2");
-                } else if (result.get().equals("three")) {
-                    paramModified = paramModified.replace("three", "3");
-                } else if (result.get().equals("four")) {
-                    paramModified = paramModified.replace("four", "4");
-                } else if (result.get().equals("five")) {
-                    paramModified = paramModified.replace("five", "5");
-                } else if (result.get().equals("six")) {
-                    paramModified = paramModified.replace("six", "6");
-                } else if (result.get().equals("seven")) {
-                    paramModified = paramModified.replace("seven", "7");
-                } else if (result.get().equals("eight")) {
-                    paramModified = paramModified.replace("eight", "8");
-                } else if (result.get().equals("nine")) {
-                    paramModified = paramModified.replace("nine", "9");
-                }
+        for (int i = line.length() - 1; i >= 0; i--) {
+            char currentChar = line.charAt(i);
+            if (Character.isDigit(currentChar)) {
+                lastDigit = Character.getNumericValue(currentChar);
+                break;
             } else {
-                //Detect not found pattern
-                exitFlag = false;
+                for (int j = line.length(); j > i; j--) {
+                    String isNumber = line.substring(i, j);
+                    if (stringToInt.containsKey(isNumber)) {
+                        lastDigit = stringToInt.get(isNumber);
+                        break;
+                    }
+                }
+                if (lastDigit != 0) {
+                    break;
+                }
             }
         }
 
-        return paramModified;
+        for (int i = 0; i < line.length(); i++) {
+            char currentChar = line.charAt(i);
+            if (Character.isDigit(currentChar)) {
+                firstDigit = Character.getNumericValue(currentChar);
+                break;
+            } else {
+                for (int j = 0; j <= i; j++) {
+                    String isNumber = line.substring(j, i + 1);
+                    if (stringToInt.containsKey(isNumber)) {
+                        firstDigit = stringToInt.get(isNumber);
+                        break;
+                    }
+                }
+                if (firstDigit != 0) {
+                    break;
+                }
+            }
+        }
+
+        firstDigit *= 10;
+        result = firstDigit + lastDigit;
+
+        return Long.valueOf(result);
     };
 
-    private Long alternative2(List<String> input) {
-        Map<String, Integer> stringToInt = new HashMap<>();
-        stringToInt.put("one", 1);
-        stringToInt.put("two", 2);
-        stringToInt.put("three", 3);
-        stringToInt.put("four", 4);
-        stringToInt.put("five", 5);
-        stringToInt.put("six", 6);
-        stringToInt.put("seven", 7);
-        stringToInt.put("eight", 8);
-        stringToInt.put("nine", 9);
-
-        int totalSum = 0;
-
-        for (String line : input) {
-            int firstDigit = 0;
-            int lastDigit = 0;
-            boolean hasChanged = false;
-
-            for (int i = line.length() - 1; i > -1; i--) {
-                char currentChar = line.charAt(i);
-                if (!hasChanged) {
-                    if (Character.isDigit(currentChar)) {
-                        lastDigit = Character.getNumericValue(currentChar);
-                        hasChanged = true;
-                    } else {
-                        for (int j = line.length(); j >= i; j--) {
-                            String isNumber = line.substring(i, j);
-                            if (stringToInt.containsKey(isNumber)) {
-                                lastDigit = stringToInt.get(isNumber);
-                                hasChanged = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            hasChanged = false;
-            for (int i = 0; i != line.length(); i++) {
-                char currentChar = line.charAt(i);
-                if (!hasChanged) {
-                    if (Character.isDigit(currentChar)) {
-                        firstDigit = Character.getNumericValue(currentChar);
-                        hasChanged = true;
-                    } else {
-                        for (int j = 0; j <= i; j++) {
-                            String isNumber = line.substring(j, i + 1);
-                            if (stringToInt.containsKey(isNumber)) {
-                                firstDigit = stringToInt.get(isNumber);
-                                hasChanged = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            firstDigit *= 10;
-            int result = firstDigit + lastDigit;
-            totalSum += result;
-        }
-
-        return Long.valueOf(totalSum);
-    }
+    // @formatter:off
 
     @Override
     public Long getPart2Result(String fileName) {
-        var badResult = Utils
-            .readFileToList(fileName)
-            .stream()
-            .map(replacePatterns)
-            .map(toCharList)
-            .map(toListOfDigits)
-            //.peek(System.out::println)
-            .map(applyRules)
-            .reduce(0L, (a, b) -> a + b);
-
-        return alternative2(Utils.readFileToList(fileName));
+        return Utils.readFileToList(fileName).stream()
+            .map(processGame)
+            .reduce(0L, Long::sum);
     }
+    // @formatter:on
 }
