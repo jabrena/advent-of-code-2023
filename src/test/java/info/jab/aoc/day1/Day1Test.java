@@ -1,6 +1,7 @@
 package info.jab.aoc.day1;
 
 import static org.assertj.core.api.BDDAssertions.then;
+
 import org.junit.jupiter.api.Test;
 
 class Day1Test {
@@ -46,7 +47,6 @@ class Day1Test {
 
     @Test
     void shouldReplace() {
-
         //Given
 
         Day1 day1 = new Day1();

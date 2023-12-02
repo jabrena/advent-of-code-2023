@@ -2,6 +2,8 @@ package info.jab.aoc.day2;
 
 import info.jab.aoc.Day;
 import info.jab.aoc.Utils;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Solution for AOC 2023, Day 2
@@ -10,96 +12,78 @@ import info.jab.aoc.Utils;
  */
 public class Day2 implements Day<Long> {
 
+    Predicate<String> isValidGame = game -> {
+        var parts = game.split(":");
+        var parts2 = parts[1].split(";");
+
+        for (String cubeSet : parts2) {
+            var cubeSetParts = cubeSet.split(",");
+            for (String item : cubeSetParts) {
+                var tuple = item.trim().split(" ");
+                String colorName = tuple[1];
+
+                CubeColor cubeColor = CubeColor.getColorFromName(colorName);
+                if (cubeColor != null) {
+                    int value = Integer.parseInt(tuple[0]);
+                    int maxValue = cubeColor.getMaxValue();
+
+                    if (value > maxValue) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    };
+
+    Function<String, Long> extractGameId = param -> {
+        var parts = param.split(":");
+        var parts2 = parts[0].split(" ");
+        return Long.valueOf(parts2[1]);
+    };
+
+    // @formatter:off
+
     @Override
     public Long getPart1Result(String fileName) {
         return Utils.readFileToList(fileName).stream()
-            .filter(game -> {
-
-                //only 12 red cubes, 13 green cubes, and 14 blue cubes
-                var maxRed = 12;
-                var maxGreen = 13;
-                var maxBlue = 14;
-
-                var parts = game.split(":");
-                var parts2 = parts[1].split(";");
-
-                for (String cubeSet : parts2) {
-                    var cubeSetParts = cubeSet.split(",");
-                    for (String item : cubeSetParts) {
-                        var tuple = item.trim().split(" ");
-                        if(tuple[1].contains("red")) {
-                            var currentRed = Integer.valueOf(tuple[0]);
-                            if(currentRed > maxRed) {
-                                return false;
-                            }
-                        }
-                        if(tuple[1].contains("green")) {
-                            var currentGreen = Integer.valueOf(tuple[0]);
-                            if(currentGreen > maxGreen) {
-                                return false;
-                            }
-                        }
-                        if(tuple[1].contains("blue")) {
-                            var currentBlue = Integer.valueOf(tuple[0]);
-                            if(currentBlue > maxBlue) {
-                                return false;
-                            }
-                        }
-                    }
-                }
-
-                return true;
-            })
-            //.peek(System.out::println)
-            .map(game -> {
-                var parts = game.split(":");
-                var parts2 = parts[0].split(" ");
-                return Long.valueOf(parts2[1]);
-            })
-            .reduce(0L, (a, b) -> a + b);
+            .filter(isValidGame)
+            .map(extractGameId)
+            .reduce(0L, Long::sum);
     }
+
+    // @formatter:on
+
+    Function<String, Long> calculatePower = param -> {
+        long red = 0L;
+        long green = 0L;
+        long blue = 0L;
+
+        for (String cubeSet : param.split(":")[1].split(";")) {
+            for (String item : cubeSet.split(",")) {
+                var tuple = item.trim().split(" ");
+                int value = Integer.parseInt(tuple[0]);
+
+                switch (tuple[1]) {
+                    case "red" -> red = Math.max(red, value);
+                    case "green" -> green = Math.max(green, value);
+                    case "blue" -> blue = Math.max(blue, value);
+                    default -> new RuntimeException("Katakroker");
+                }
+            }
+        }
+        return red * green * blue;
+    };
+
+    // @formatter:off
 
     @Override
     public Long getPart2Result(String fileName) {
         return Utils.readFileToList(fileName).stream()
-            .map(game -> {
-
-                var red = 0L;
-                var green = 0L;
-                var blue = 0L;
-
-                var parts = game.split(":");
-                var parts2 = parts[1].split(";");
-
-                for (String cubeSet : parts2) {
-                    var cubeSetParts = cubeSet.split(",");
-                    for (String item : cubeSetParts) {
-                        var tuple = item.trim().split(" ");
-                        if(tuple[1].contains("red")) {
-                            var currentRed = Integer.valueOf(tuple[0]);
-                            if(currentRed > red) {
-                                red = currentRed;
-                            }
-                        }
-                        if(tuple[1].contains("green")) {
-                            var currentGreen = Integer.valueOf(tuple[0]);
-                            if(currentGreen > green) {
-                                green = currentGreen;
-                            }
-                        }
-                        if(tuple[1].contains("blue")) {
-                            var currentBlue = Integer.valueOf(tuple[0]);
-                            if(currentBlue > blue) {
-                                blue = currentBlue;
-                            }
-                        }
-                    }
-                }
-
-                return red * green * blue;
-            })
-            .reduce(0L, (a, b) -> a + b);
-
+            .map(calculatePower)
+            .reduce(0L, Long::sum);
     }
+    // @formatter:on
 
 }
