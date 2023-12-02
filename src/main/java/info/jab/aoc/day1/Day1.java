@@ -2,9 +2,12 @@ package info.jab.aoc.day1;
 
 import info.jab.aoc.Day;
 import info.jab.aoc.Utils;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Solution for AOC 2023, Day 1
@@ -49,69 +52,46 @@ public class Day1 implements Day<Long> {
 
     // @formatter:on
 
-    Function<String, Long> processGame = line -> {
-        // @formatter:off
+    private static Map<String, Integer> createWordToNumberMap() {
+        Map<String, Integer> mp = new HashMap<>();
+        mp.put("one", 1);
+        mp.put("two", 2);
+        mp.put("three", 3);
+        mp.put("four", 4);
+        mp.put("five", 5);
+        mp.put("six", 6);
+        mp.put("seven", 7);
+        mp.put("eight", 8);
+        mp.put("nine", 9);
+        mp.put("oneight", 18); //AOC Trick
+        mp.put("twone", 21); //AOC Trick
+        mp.put("eightwo", 82); //AOC Trick
+        return mp;
+    }
 
-        Map<String, Integer> stringToInt = Map.of(
-            "one", 1,
-            "two", 2,
-            "three", 3,
-            "four", 4,
-            "five", 5,
-            "six", 6,
-            "seven", 7,
-            "eight", 8,
-            "nine", 9
-        );
+    private static final String DIGIT_REGEX =
+        "(?:\\d+|oneight|twone|eightwo|one|two|three|four|five|six|seven|eight|nine)";
+    private static final Pattern DIGITS_REGEX_PATTERN = Pattern.compile(DIGIT_REGEX);
 
-        // @formatter:on
+    Function<String, Long> extractNumber = param -> {
+        Map<String, Integer> wordToNumber = createWordToNumberMap();
 
-        int result = 0;
-        int firstDigit = 0;
-        int lastDigit = 0;
-
-        for (int i = line.length() - 1; i >= 0; i--) {
-            char currentChar = line.charAt(i);
-            if (Character.isDigit(currentChar)) {
-                lastDigit = Character.getNumericValue(currentChar);
-                break;
+        StringBuilder digits = new StringBuilder();
+        Matcher matcher = DIGITS_REGEX_PATTERN.matcher(param);
+        while (matcher.find()) {
+            String match = matcher.group().toLowerCase();
+            if (Character.isDigit(match.charAt(0))) {
+                digits.append(match);
             } else {
-                for (int j = line.length(); j > i; j--) {
-                    String isNumber = line.substring(i, j);
-                    if (stringToInt.containsKey(isNumber)) {
-                        lastDigit = stringToInt.get(isNumber);
-                        break;
-                    }
-                }
-                if (lastDigit != 0) {
-                    break;
-                }
+                digits.append(wordToNumber.get(match));
             }
         }
 
-        for (int i = 0; i < line.length(); i++) {
-            char currentChar = line.charAt(i);
-            if (Character.isDigit(currentChar)) {
-                firstDigit = Character.getNumericValue(currentChar);
-                break;
-            } else {
-                for (int j = 0; j <= i; j++) {
-                    String isNumber = line.substring(j, i + 1);
-                    if (stringToInt.containsKey(isNumber)) {
-                        firstDigit = stringToInt.get(isNumber);
-                        break;
-                    }
-                }
-                if (firstDigit != 0) {
-                    break;
-                }
-            }
-        }
+        String number = "";
+        number += digits.charAt(0);
+        number += digits.charAt(digits.length() - 1);
 
-        firstDigit *= 10;
-        result = firstDigit + lastDigit;
-
-        return Long.valueOf(result);
+        return Long.valueOf(number);
     };
 
     // @formatter:off
@@ -119,7 +99,7 @@ public class Day1 implements Day<Long> {
     @Override
     public Long getPart2Result(String fileName) {
         return Utils.readFileToList(fileName).stream()
-            .map(processGame)
+            .map(extractNumber)
             .reduce(0L, Long::sum);
     }
     // @formatter:on
