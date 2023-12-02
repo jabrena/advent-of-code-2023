@@ -11,10 +11,23 @@ class Day2Test {
         String fileName = "day2/input-sample.txt";
 
         //When
-        Day2 day1 = new Day2();
-        var result = day1.getPart1Result(fileName);
+        Day2 day2 = new Day2();
+        var result = day2.getPart1Result(fileName);
 
         //Then
         then(result).isEqualTo(8);
+    }
+
+    @Test
+    void should_solve_day2_part1() {
+        //Given
+        String fileName = "day2/input.txt";
+
+        //When
+        Day2 day2 = new Day2();
+        var result = day2.getPart1Result(fileName);
+
+        //Then
+        then(result).isEqualTo(2683);
     }
 }
