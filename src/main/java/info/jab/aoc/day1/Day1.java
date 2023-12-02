@@ -5,6 +5,8 @@ import info.jab.aoc.Utils;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Solution for AOC 2023, Day 1
@@ -47,71 +49,39 @@ public class Day1 implements Day<Long> {
             .reduce(0L, Long::sum);
     }
 
+    private static final Map<String, String> map = Map.of(
+        "one", "1",
+        "two", "2",
+        "three", "3",
+        "four", "4",
+        "five", "5",
+        "six", "6",
+        "seven", "7",
+        "eight", "8",
+        "nine", "9"
+    );
+
     // @formatter:on
 
-    Function<String, Long> processGame = line -> {
-        // @formatter:off
+    private static final Pattern DIGITS_REGEX_PATTERN = Pattern.compile(
+        "one|two|three|four|five|six|seven|eight|nine|\\d"
+    );
 
-        Map<String, Integer> stringToInt = Map.of(
-            "one", 1,
-            "two", 2,
-            "three", 3,
-            "four", 4,
-            "five", 5,
-            "six", 6,
-            "seven", 7,
-            "eight", 8,
-            "nine", 9
-        );
+    Function<String, Long> extractNumber = line -> {
+        Matcher matcher = DIGITS_REGEX_PATTERN.matcher(line);
 
-        // @formatter:on
+        String first = "";
+        String last = "";
 
-        int result = 0;
-        int firstDigit = 0;
-        int lastDigit = 0;
-
-        for (int i = line.length() - 1; i >= 0; i--) {
-            char currentChar = line.charAt(i);
-            if (Character.isDigit(currentChar)) {
-                lastDigit = Character.getNumericValue(currentChar);
-                break;
-            } else {
-                for (int j = line.length(); j > i; j--) {
-                    String isNumber = line.substring(i, j);
-                    if (stringToInt.containsKey(isNumber)) {
-                        lastDigit = stringToInt.get(isNumber);
-                        break;
-                    }
-                }
-                if (lastDigit != 0) {
-                    break;
-                }
+        while (matcher.find()) {
+            if (first.isEmpty()) {
+                first = matcher.group();
             }
+            last = matcher.group();
+            matcher.region(matcher.start() + 1, line.length());
         }
-
-        for (int i = 0; i < line.length(); i++) {
-            char currentChar = line.charAt(i);
-            if (Character.isDigit(currentChar)) {
-                firstDigit = Character.getNumericValue(currentChar);
-                break;
-            } else {
-                for (int j = 0; j <= i; j++) {
-                    String isNumber = line.substring(j, i + 1);
-                    if (stringToInt.containsKey(isNumber)) {
-                        firstDigit = stringToInt.get(isNumber);
-                        break;
-                    }
-                }
-                if (firstDigit != 0) {
-                    break;
-                }
-            }
-        }
-
-        firstDigit *= 10;
-        result = firstDigit + lastDigit;
-
-        return Long.valueOf(result);
+        String number = map.getOrDefault(first, first) + map.getOrDefault(last, last);
+        return Long.valueOf(number);
     };
 
     // @formatter:off
@@ -119,7 +89,7 @@ public class Day1 implements Day<Long> {
     @Override
     public Long getPart2Result(String fileName) {
         return Utils.readFileToList(fileName).stream()
-            .map(processGame)
+            .map(extractNumber)
             .reduce(0L, Long::sum);
     }
     // @formatter:on
