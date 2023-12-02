@@ -12,28 +12,47 @@ import java.util.function.Predicate;
  */
 public class Day2 implements Day<Long> {
 
-    Predicate<String> isValidGame = game -> {
-        var parts = game.split(":");
-        var parts2 = parts[1].split(";");
+    enum CubeColor {
+        RED(12),
+        GREEN(13),
+        BLUE(14);
 
-        for (String cubeSet : parts2) {
+        private final int maxValue;
+
+        CubeColor(int maxValue) {
+            this.maxValue = maxValue;
+        }
+
+        int getMaxValue() {
+            return maxValue;
+        }
+
+        static CubeColor getColorFromName(String colorName) {
+            return switch (colorName.toLowerCase()) {
+                case "red" -> RED;
+                case "green" -> GREEN;
+                case "blue" -> BLUE;
+                default -> throw new RuntimeException("Katakroker");
+            };
+        }
+    }
+
+    Predicate<String> isValidGame = game -> {
+        for (String cubeSet : game.split(":")[1].split(";")) {
             var cubeSetParts = cubeSet.split(",");
             for (String item : cubeSetParts) {
                 var tuple = item.trim().split(" ");
                 String colorName = tuple[1];
 
                 CubeColor cubeColor = CubeColor.getColorFromName(colorName);
-                if (cubeColor != null) {
-                    int value = Integer.parseInt(tuple[0]);
-                    int maxValue = cubeColor.getMaxValue();
+                int value = Integer.parseInt(tuple[0]);
+                int maxValue = cubeColor.getMaxValue();
 
-                    if (value > maxValue) {
-                        return false;
-                    }
+                if (value > maxValue) {
+                    return false;
                 }
             }
         }
-
         return true;
     };
 
@@ -69,7 +88,7 @@ public class Day2 implements Day<Long> {
                     case "red" -> red = Math.max(red, value);
                     case "green" -> green = Math.max(green, value);
                     case "blue" -> blue = Math.max(blue, value);
-                    default -> new RuntimeException("Katakroker");
+                    default -> throw new RuntimeException("Katakroker");
                 }
             }
         }
