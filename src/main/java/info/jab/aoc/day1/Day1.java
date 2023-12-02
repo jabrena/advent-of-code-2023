@@ -1,13 +1,13 @@
 package info.jab.aoc.day1;
 
-import info.jab.aoc.Day;
-import info.jab.aoc.Utils;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import info.jab.aoc.Day;
+import info.jab.aoc.Utils;
 
 /**
  * Solution for AOC 2023, Day 1
@@ -53,25 +53,25 @@ public class Day1 implements Day<Long> {
     // @formatter:on
 
     private static Map<String, Integer> createWordToNumberMap() {
-        Map<String, Integer> mp = new HashMap<>();
-        mp.put("one", 1);
-        mp.put("two", 2);
-        mp.put("three", 3);
-        mp.put("four", 4);
-        mp.put("five", 5);
-        mp.put("six", 6);
-        mp.put("seven", 7);
-        mp.put("eight", 8);
-        mp.put("nine", 9);
-        mp.put("oneight", 18); //AOC Trick
-        mp.put("twone", 21); //AOC Trick
-        mp.put("eightwo", 82); //AOC Trick
-        return mp;
+        return Map.ofEntries(
+            Map.entry("one", 1),
+            Map.entry("two", 2),
+            Map.entry("three", 3),
+            Map.entry("four", 4),
+            Map.entry("five", 5),
+            Map.entry("six", 6),
+            Map.entry("seven", 7),
+            Map.entry("eight", 8),
+            Map.entry("nine", 9),
+            Map.entry("oneight", 18), //AOC Trick
+            Map.entry("twone", 21), //AOC Trick
+            Map.entry("eightwo", 82) //AOC Trick
+        );
     }
 
-    private static final String DIGIT_REGEX =
-        "(?:\\d+|oneight|twone|eightwo|one|two|three|four|five|six|seven|eight|nine)";
-    private static final Pattern DIGITS_REGEX_PATTERN = Pattern.compile(DIGIT_REGEX);
+    private static final Pattern DIGITS_REGEX_PATTERN = Pattern.compile(
+        "(?:\\d+|oneight|twone|eightwo|one|two|three|four|five|six|seven|eight|nine)"
+    );
 
     Function<String, Long> extractNumber = param -> {
         Map<String, Integer> wordToNumber = createWordToNumberMap();
@@ -79,17 +79,11 @@ public class Day1 implements Day<Long> {
         StringBuilder digits = new StringBuilder();
         Matcher matcher = DIGITS_REGEX_PATTERN.matcher(param);
         while (matcher.find()) {
-            String match = matcher.group().toLowerCase();
-            if (Character.isDigit(match.charAt(0))) {
-                digits.append(match);
-            } else {
-                digits.append(wordToNumber.get(match));
-            }
+            String match = matcher.group();
+            digits.append(Character.isDigit(match.charAt(0)) ? match : wordToNumber.get(match));
         }
 
-        String number = "";
-        number += digits.charAt(0);
-        number += digits.charAt(digits.length() - 1);
+        String number = String.valueOf(digits.charAt(0)) + digits.charAt(digits.length() - 1);
 
         return Long.valueOf(number);
     };
