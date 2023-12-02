@@ -8,4 +8,7 @@
     <suppress checks="Indentation" files="." />
     <suppress checks="VariableDeclarationUsageDistance" files="." />
     <suppress checks="AbbreviationAsWordInName" files="." />
+
+    <!--Codespaces-->
+    <suppress checks="CustomImportOrder" files="."/>
 </suppressions>
