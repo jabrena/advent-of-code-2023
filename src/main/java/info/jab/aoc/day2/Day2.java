@@ -1,0 +1,41 @@
+package info.jab.aoc.day2;
+
+import java.util.Arrays;
+
+import info.jab.aoc.Day;
+import info.jab.aoc.Utils;
+
+/**
+ * Solution for AOC 2023, Day 2
+ * https://adventofcode.com/2023/day/2
+ *
+ */
+public class Day2 implements Day<Long> {
+
+    @Override
+    public Long getPart1Result(String fileName) {
+        return Utils.readFileToList(fileName).stream()
+            .peek(System.out::println)
+            .filter(game -> {
+                //only 12 red cubes, 13 green cubes, and 14 blue cubes
+                var parts = game.split(":");
+                var parts2 = parts[1].split(";");
+
+                Arrays.stream(parts2).forEach(System.out::println);
+
+                return true;
+            })
+            .map(game -> {
+                var parts = game.split(":");
+                var parts2 = parts[0].split(" ");
+                return Long.valueOf(parts2[1]);
+            })
+            .reduce(0L, (a, b) -> a + b);
+    }
+
+    @Override
+    public Long getPart2Result(String fileName) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+}
