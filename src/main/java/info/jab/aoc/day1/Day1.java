@@ -4,7 +4,6 @@ import info.jab.aoc.Day;
 import info.jab.aoc.Utils;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -71,11 +70,11 @@ public class Day1 implements Day<Long> {
     Function<String, Long> extractNumber = line -> {
         Matcher matcher = DIGITS_REGEX_PATTERN.matcher(line);
 
-        String first = null;
-        String last = null;
+        String first = "";
+        String last = "";
 
         while (matcher.find()) {
-            if (Objects.isNull(first)) {
+            if (first.isEmpty()) {
                 first = matcher.group();
             }
             last = matcher.group();
