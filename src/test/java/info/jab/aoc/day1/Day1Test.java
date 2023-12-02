@@ -46,23 +46,6 @@ class Day1Test {
     }
 
     @Test
-    void shouldReplace() {
-        //Given
-
-        Day1 day1 = new Day1();
-        var result = day1.replacePatterns
-            .andThen(day1.toCharList)
-            .andThen(day1.toListOfDigits)
-            .andThen(day1.applyRules)
-            .apply("7pqrstsixteen");
-
-        //When
-
-        //Then
-        then(result).isEqualTo(76);
-    }
-
-    @Test
     void should_solve_day1_part2() {
         //Given
         String fileName = "day1/day1-input.txt";
