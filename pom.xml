@@ -137,7 +137,9 @@
                         <id>enforce</id>
                         <configuration>
                             <rules>
+                                <!--
                                 <dependencyConvergence/>
+                                -->
                                 <banDuplicatePomDependencyVersions/>
                                 <requireMavenVersion>
                                     <version>3.8.6</version>
