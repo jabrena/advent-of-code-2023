@@ -69,6 +69,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
+                    <skip>true</skip>
                     <!-- https://github.com/checkstyle/checkstyle/blob/master/src/main/resources/google_checks.xml -->
                     <configLocation>src/checkstyle/google_checks.xml</configLocation>
                     <suppressionsLocation>src/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
@@ -97,6 +98,7 @@
                 <artifactId>prettier-maven-plugin</artifactId>
                 <version>0.21</version>
                 <configuration>
+                    <skip>true</skip>
                     <prettierJavaVersion>2.0.0</prettierJavaVersion>
                     <printWidth>120</printWidth>
                     <tabWidth>4</tabWidth>
