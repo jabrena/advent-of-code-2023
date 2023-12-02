@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 class Day1Test {
 
     @Test
-    void should_solve_day1_with_sample() {
+    void should_solve_day1_part1_with_sample() {
         //Given
         String fileName = "day1/day1-input-sample.txt";
 
@@ -19,7 +19,7 @@ class Day1Test {
     }
 
     @Test
-    void should_solve_day1() {
+    void should_solve_day1_part1() {
         //Given
         String fileName = "day1/day1-input.txt";
 
@@ -29,5 +29,20 @@ class Day1Test {
 
         //Then
         then(result).isEqualTo(53974);
+    }
+
+    @Test
+    void should_solve_day1_part2_with_sample() {
+        //Given
+        String fileName = "day1/day1-input2-sample.txt";
+
+        //When
+        Day1 day1 = new Day1();
+        var result = day1.getPart2Result(fileName);
+
+        //29, 83, 13, 24, 42, 14, and 76
+
+        //Then
+        then(result).isEqualTo(281);
     }
 }
