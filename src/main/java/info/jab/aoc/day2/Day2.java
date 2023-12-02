@@ -13,7 +13,6 @@ import java.util.function.Predicate;
 public class Day2 implements Day<Long> {
 
     Predicate<String> isValidGame = game -> {
-        final String[] colors = { "red", "green", "blue" };
         var parts = game.split(":");
         var parts2 = parts[1].split(";");
 
@@ -21,16 +20,15 @@ public class Day2 implements Day<Long> {
             var cubeSetParts = cubeSet.split(",");
             for (String item : cubeSetParts) {
                 var tuple = item.trim().split(" ");
-                String color = tuple[1];
+                String colorName = tuple[1];
 
-                for (String currentColor : colors) {
-                    if (color.contains(currentColor)) {
-                        int value = Integer.parseInt(tuple[0]);
-                        int maxValue = getMaxValueForColor(currentColor);
+                CubeColor cubeColor = CubeColor.getColorFromName(colorName);
+                if (cubeColor != null) {
+                    int value = Integer.parseInt(tuple[0]);
+                    int maxValue = cubeColor.getMaxValue();
 
-                        if (value > maxValue) {
-                            return false;
-                        }
+                    if (value > maxValue) {
+                        return false;
                     }
                 }
             }
@@ -38,15 +36,6 @@ public class Day2 implements Day<Long> {
 
         return true;
     };
-
-    private int getMaxValueForColor(String color) {
-        return switch (color) {
-            case "red" -> 12;
-            case "green" -> 13;
-            case "blue" -> 14;
-            default -> Integer.MAX_VALUE; // Or handle unknown colors differently
-        };
-    }
 
     Function<String, Long> extractGameId = param -> {
         var parts = param.split(":");
@@ -66,32 +55,35 @@ public class Day2 implements Day<Long> {
 
     // @formatter:on
 
+    Function<String, Long> calculatePower = param -> {
+        long red = 0L;
+        long green = 0L;
+        long blue = 0L;
+
+        for (String cubeSet : param.split(":")[1].split(";")) {
+            for (String item : cubeSet.split(",")) {
+                var tuple = item.trim().split(" ");
+                int value = Integer.parseInt(tuple[0]);
+
+                switch (tuple[1]) {
+                    case "red" -> red = Math.max(red, value);
+                    case "green" -> green = Math.max(green, value);
+                    case "blue" -> blue = Math.max(blue, value);
+                    default -> new RuntimeException("Katakroker");
+                }
+            }
+        }
+        return red * green * blue;
+    };
+
+    // @formatter:off
+
     @Override
     public Long getPart2Result(String fileName) {
-        return Utils
-            .readFileToList(fileName)
-            .stream()
-            .map(game -> {
-                long red = 0L;
-                long green = 0L;
-                long blue = 0L;
-
-                for (String cubeSet : game.split(":")[1].split(";")) {
-                    for (String item : cubeSet.split(",")) {
-                        var tuple = item.trim().split(" ");
-                        int value = Integer.parseInt(tuple[0]);
-
-                        switch (tuple[1]) {
-                            case "red" -> red = Math.max(red, value);
-                            case "green" -> green = Math.max(green, value);
-                            case "blue" -> blue = Math.max(blue, value);
-                            default -> new RuntimeException("Katakroker");
-                        }
-                    }
-                }
-
-                return red * green * blue;
-            })
+        return Utils.readFileToList(fileName).stream()
+            .map(calculatePower)
             .reduce(0L, Long::sum);
     }
+    // @formatter:on
+
 }
