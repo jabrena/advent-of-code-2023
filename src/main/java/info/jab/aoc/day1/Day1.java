@@ -1,12 +1,11 @@
 package info.jab.aoc.day1;
 
+import info.jab.aoc.Day;
+import info.jab.aoc.Utils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-
-import info.jab.aoc.Day;
-import info.jab.aoc.Utils;
 
 /**
  * Solution for AOC 2023, Day 1
@@ -35,9 +34,9 @@ public class Day1 implements Day<Long> {
 
         //TODO Improve with a Switch case
         String result = "";
-        if(param.size() == 1) {
+        if (param.size() == 1) {
             result = String.valueOf(param.getFirst()) + String.valueOf(param.getFirst());
-        } else if(param.size() == 2) {
+        } else if (param.size() == 2) {
             result = String.valueOf(param.getFirst()) + String.valueOf(param.getLast());
         } else {
             result = String.valueOf(param.getFirst()) + String.valueOf(param.getLast());
@@ -58,14 +57,12 @@ public class Day1 implements Day<Long> {
     // @formatter:on
 
     Function<String, String> replacePatterns = param -> {
-
         var paramModified = param;
 
         Boolean exitFlag = true;
         Map<String, Integer> detections = new HashMap<>();
 
         while (exitFlag) {
-
             //Detect first pattern to apply
             //System.out.println("running");
 
@@ -81,34 +78,35 @@ public class Day1 implements Day<Long> {
             detections.put("eight", paramModified.indexOf("eight"));
             detections.put("nine", paramModified.indexOf("nine"));
 
-            var result = detections.entrySet().stream()
+            var result = detections
+                .entrySet()
+                .stream()
                 .filter(entry -> entry.getValue() != -1)
                 .sorted(Map.Entry.comparingByValue())
                 //.peek(System.out::println)
                 .map(entry -> entry.getKey())
                 .findFirst();
-            //.forEach(entry -> System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue()));
 
             //Apply pattern
 
-            if(result.isPresent()) {
-                if(result.get().equals("one")) {
+            if (result.isPresent()) {
+                if (result.get().equals("one")) {
                     paramModified = paramModified.replace("one", "1");
-                } else if(result.get().equals("two")) {
+                } else if (result.get().equals("two")) {
                     paramModified = paramModified.replace("two", "2");
-                } else if(result.get().equals("three")) {
+                } else if (result.get().equals("three")) {
                     paramModified = paramModified.replace("three", "3");
-                } else if(result.get().equals("four")) {
+                } else if (result.get().equals("four")) {
                     paramModified = paramModified.replace("four", "4");
-                } else if(result.get().equals("five")) {
+                } else if (result.get().equals("five")) {
                     paramModified = paramModified.replace("five", "5");
-                } else if(result.get().equals("six")) {
+                } else if (result.get().equals("six")) {
                     paramModified = paramModified.replace("six", "6");
-                } else if(result.get().equals("seven")) {
+                } else if (result.get().equals("seven")) {
                     paramModified = paramModified.replace("seven", "7");
-                } else if(result.get().equals("eight")) {
+                } else if (result.get().equals("eight")) {
                     paramModified = paramModified.replace("eight", "8");
-                } else if(result.get().equals("nine")) {
+                } else if (result.get().equals("nine")) {
                     paramModified = paramModified.replace("nine", "9");
                 }
             } else {
@@ -121,7 +119,6 @@ public class Day1 implements Day<Long> {
     };
 
     private Long alternative2(List<String> input) {
-
         Map<String, Integer> stringToInt = new HashMap<>();
         stringToInt.put("one", 1);
         stringToInt.put("two", 2);
@@ -154,7 +151,6 @@ public class Day1 implements Day<Long> {
                                 hasChanged = true;
                                 break;
                             }
-
                         }
                     }
                 }
@@ -182,7 +178,6 @@ public class Day1 implements Day<Long> {
             firstDigit *= 10;
             int result = firstDigit + lastDigit;
             totalSum += result;
-
         }
 
         return Long.valueOf(totalSum);
@@ -190,8 +185,9 @@ public class Day1 implements Day<Long> {
 
     @Override
     public Long getPart2Result(String fileName) {
-
-        var badResult = Utils.readFileToList(fileName).stream()
+        var badResult = Utils
+            .readFileToList(fileName)
+            .stream()
             .map(replacePatterns)
             .map(toCharList)
             .map(toListOfDigits)

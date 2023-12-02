@@ -2,6 +2,8 @@ package info.jab.aoc.day2;
 
 import info.jab.aoc.Day;
 import info.jab.aoc.Utils;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Solution for AOC 2023, Day 2
@@ -10,96 +12,86 @@ import info.jab.aoc.Utils;
  */
 public class Day2 implements Day<Long> {
 
-    @Override
-    public Long getPart1Result(String fileName) {
-        return Utils.readFileToList(fileName).stream()
-            .filter(game -> {
+    Predicate<String> isValidGame = game -> {
+        final String[] colors = { "red", "green", "blue" };
+        var parts = game.split(":");
+        var parts2 = parts[1].split(";");
 
-                //only 12 red cubes, 13 green cubes, and 14 blue cubes
-                var maxRed = 12;
-                var maxGreen = 13;
-                var maxBlue = 14;
+        for (String cubeSet : parts2) {
+            var cubeSetParts = cubeSet.split(",");
+            for (String item : cubeSetParts) {
+                var tuple = item.trim().split(" ");
+                String color = tuple[1];
 
-                var parts = game.split(":");
-                var parts2 = parts[1].split(";");
+                for (String currentColor : colors) {
+                    if (color.contains(currentColor)) {
+                        int value = Integer.parseInt(tuple[0]);
+                        int maxValue = getMaxValueForColor(currentColor);
 
-                for (String cubeSet : parts2) {
-                    var cubeSetParts = cubeSet.split(",");
-                    for (String item : cubeSetParts) {
-                        var tuple = item.trim().split(" ");
-                        if(tuple[1].contains("red")) {
-                            var currentRed = Integer.valueOf(tuple[0]);
-                            if(currentRed > maxRed) {
-                                return false;
-                            }
-                        }
-                        if(tuple[1].contains("green")) {
-                            var currentGreen = Integer.valueOf(tuple[0]);
-                            if(currentGreen > maxGreen) {
-                                return false;
-                            }
-                        }
-                        if(tuple[1].contains("blue")) {
-                            var currentBlue = Integer.valueOf(tuple[0]);
-                            if(currentBlue > maxBlue) {
-                                return false;
-                            }
+                        if (value > maxValue) {
+                            return false;
                         }
                     }
                 }
+            }
+        }
 
-                return true;
-            })
-            //.peek(System.out::println)
-            .map(game -> {
-                var parts = game.split(":");
-                var parts2 = parts[0].split(" ");
-                return Long.valueOf(parts2[1]);
-            })
-            .reduce(0L, (a, b) -> a + b);
+        return true;
+    };
+
+    private int getMaxValueForColor(String color) {
+        return switch (color) {
+            case "red" -> 12;
+            case "green" -> 13;
+            case "blue" -> 14;
+            default -> Integer.MAX_VALUE; // Or handle unknown colors differently
+        };
     }
+
+    Function<String, Long> extractGameId = param -> {
+        var parts = param.split(":");
+        var parts2 = parts[0].split(" ");
+        return Long.valueOf(parts2[1]);
+    };
+
+    // @formatter:off
+
+    @Override
+    public Long getPart1Result(String fileName) {
+        return Utils.readFileToList(fileName).stream()
+            .filter(isValidGame)
+            .map(extractGameId)
+            .reduce(0L, Long::sum);
+    }
+
+    // @formatter:on
 
     @Override
     public Long getPart2Result(String fileName) {
-        return Utils.readFileToList(fileName).stream()
+        return Utils
+            .readFileToList(fileName)
+            .stream()
             .map(game -> {
+                long red = 0L;
+                long green = 0L;
+                long blue = 0L;
 
-                var red = 0L;
-                var green = 0L;
-                var blue = 0L;
-
-                var parts = game.split(":");
-                var parts2 = parts[1].split(";");
-
-                for (String cubeSet : parts2) {
-                    var cubeSetParts = cubeSet.split(",");
-                    for (String item : cubeSetParts) {
+                for (String cubeSet : game.split(":")[1].split(";")) {
+                    for (String item : cubeSet.split(",")) {
                         var tuple = item.trim().split(" ");
-                        if(tuple[1].contains("red")) {
-                            var currentRed = Integer.valueOf(tuple[0]);
-                            if(currentRed > red) {
-                                red = currentRed;
-                            }
-                        }
-                        if(tuple[1].contains("green")) {
-                            var currentGreen = Integer.valueOf(tuple[0]);
-                            if(currentGreen > green) {
-                                green = currentGreen;
-                            }
-                        }
-                        if(tuple[1].contains("blue")) {
-                            var currentBlue = Integer.valueOf(tuple[0]);
-                            if(currentBlue > blue) {
-                                blue = currentBlue;
-                            }
+                        int value = Integer.parseInt(tuple[0]);
+
+                        switch (tuple[1]) {
+                            case "red" -> red = Math.max(red, value);
+                            case "green" -> green = Math.max(green, value);
+                            case "blue" -> blue = Math.max(blue, value);
+                            default -> new RuntimeException("Katakroker");
                         }
                     }
                 }
 
                 return red * green * blue;
             })
-            .reduce(0L, (a, b) -> a + b);
-
+            .reduce(0L, Long::sum);
     }
-
 }

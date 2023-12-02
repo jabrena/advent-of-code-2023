@@ -1,6 +1,7 @@
 package info.jab.aoc.day2;
 
 import static org.assertj.core.api.BDDAssertions.then;
+
 import org.junit.jupiter.api.Test;
 
 class Day2Test {
