@@ -54,6 +54,13 @@ public class Utils {
     public static Function<String, String> readFileToStringF =
             fileName -> readFileToString(fileName);
 
+
+    public static File getFile(String fileName) {
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        File file = new File(classloader.getResource(fileName).getFile());
+        return file;
+    }
+
     /**
      * This pattern is used to identify blank patterns when you iterate in the file content.
      */
