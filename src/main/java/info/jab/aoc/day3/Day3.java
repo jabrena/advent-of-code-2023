@@ -55,17 +55,6 @@ class Day3  implements Day<Long> {
                 matrix[i][j] = "" + param.get(i).charAt(j);
             }
         }
-
-        /*
-        // Printing the 2D array
-        for (int i = 0; i < matrixDimension.y(); i++) {
-            for (int j = 0; j < matrixDimension.x(); j++) {
-                System.out.print(matrix[i][j] + "\t");
-            }
-            System.out.println();
-        }
-        */
-
         return matrix;
     };
 
@@ -84,10 +73,8 @@ class Day3  implements Day<Long> {
         }
     }
 
-    //TODO Improve the scope
-    private static Set<String> symbols;
-
-    private int findNumber(String[][] grid, int x, int y) {
+    //TODO Improve this part
+    private int findNumber(Set<String> symbols, String[][] grid, int x, int y) {
         // go all the way left until we hit a ., x=0, or a symbol knowing we are past the left end of the number
         while (x >= 0 && grid[y][x].charAt(0) != '.' && !symbols.contains(grid[y][x])) {
             x--;
@@ -107,7 +94,7 @@ class Day3  implements Day<Long> {
         return Integer.parseInt(number.toString());
     }
 
-    private Set<Integer> findNumbersAdjacentTo(String[][] grid, Symbol symbol) {
+    private Set<Integer> findNumbersAdjacentTo(Set<String> symbols, String[][] grid, Symbol symbol) {
         int[][] directions = symbol.getAdjacents();
 
         Set<Integer> numbers = new HashSet<>();
@@ -118,82 +105,73 @@ class Day3  implements Day<Long> {
 
             String atPosition = grid[y][x];
             if (Character.isDigit(atPosition.charAt(0))) {
-                numbers.add(findNumber(grid, x, y));
+                numbers.add(findNumber(symbols, grid, x, y));
             }
         }
 
         return numbers;
     }
 
-    @Override
-    public Long getPart1Result(String fileName) {
+    private List<Symbol> getSymbols(Set<String> symbols, String[][] matrix) {
 
-        var lines = Utils.readFileToList(fileName);
-        symbols = findDifferentSymbols.apply(lines);
-        System.out.println("Combined Set: " + symbols);
+        List<Symbol> list = new ArrayList<>();
 
-        String[][] matrix = createMatrix.apply(lines);
         int rows = matrix.length;
         int cols = matrix[0].length;
-
-        String[][] grid = matrix;
-        List<Symbol> symbols2 = new ArrayList<>();
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 String element = matrix[i][j];
                 if(symbols.contains(element)) {
-                    //System.out.println("x:" + j + " y:" + i + " = " + element);
 
                     //Find adjacents
                     int symbolX = j;
                     int symbolY = i;
 
-                    symbols2.add(new Symbol(element, symbolX, symbolY));
+                    list.add(new Symbol(element, symbolX, symbolY));
                 }
             }
         }
 
+        return list;
+    };
+
+    @Override
+    public Long getPart1Result(String fileName) {
+
+        var lines = Utils.readFileToList(fileName);
+        String[][] matrix = createMatrix.apply(lines);
+
+        Set<String> symbols = findDifferentSymbols.apply(lines);
+        System.out.println("Combined Set: " + symbols);
+
+        var symbols2 = getSymbols(symbols, matrix);
+
         var result = String.valueOf(symbols2.stream()
-                .flatMap(sym -> findNumbersAdjacentTo(grid, sym).stream())
+                .flatMap(sym -> findNumbersAdjacentTo(symbols, matrix, sym).stream())
                 .reduce(0, Integer::sum));
 
         return Long.valueOf(result);
     }
 
+    // @formatter:off
+
     @Override
     public Long getPart2Result(String fileName) {
 
         var lines = Utils.readFileToList(fileName);
-        symbols = findDifferentSymbols.apply(lines);
+        Set<String> symbols = findDifferentSymbols.apply(lines);
         System.out.println("Combined Set: " + symbols);
 
         String[][] matrix = createMatrix.apply(lines);
-        int rows = matrix.length;
-        int cols = matrix[0].length;
+        var symbols2 = getSymbols(symbols, matrix);
 
-        String[][] grid = matrix;
-        List<Symbol> symbols2 = new ArrayList<>();
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                String element = matrix[i][j];
-                if(symbols.contains(element)) {
-                    //System.out.println("x:" + j + " y:" + i + " = " + element);
-
-                    //Find adjacents
-                    int symbolX = j;
-                    int symbolY = i;
-
-                    symbols2.add(new Symbol(element, symbolX, symbolY));
-                }
-            }
-        }
-
-        List<Symbol> gears = symbols2.stream().filter(symbol -> symbol.symbol.equals("*")).toList();
+        List<Symbol> gears = symbols2.stream()
+            .filter(symbol -> symbol.symbol.equals("*"))
+            .toList();
 
         var result = String.valueOf(gears.stream()
-                .map(symbol -> findNumbersAdjacentTo(grid, symbol))
+                .map(symbol -> findNumbersAdjacentTo(symbols, matrix, symbol))
                 .filter(set -> set.size() == 2)
                 .map(set -> {
                     List<Integer> nums = set.stream().toList();
@@ -203,5 +181,7 @@ class Day3  implements Day<Long> {
 
         return Long.valueOf(result);
     }
+
+    // @formatter:on
 
 }
